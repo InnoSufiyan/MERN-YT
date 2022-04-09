@@ -9,6 +9,8 @@ dotenv.config({
 
 require('./db/conn')
 
+app.use(express.json())
+
 //linking files to make route easy
 
 app.use(require('./router/auth'))
