@@ -68,7 +68,9 @@ router.post('/register', async (req, res) => {
 router.post("/login", async (req, res) => {
     const { email, password } = req.body
 
-    if (!email || !password) {
+    console.log(typeof password)
+
+    if (!email || !password || typeof password !== "string") {
         return res.status(422).json({
             error: "Please fill the field properly"
         })
