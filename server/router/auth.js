@@ -1,4 +1,5 @@
 const express = require('express')
+const bcrypt = require('bcryptjs')
 
 const router = express.Router()
 
@@ -19,37 +20,46 @@ router.post('/register', async (req, res) => {
         return res.status(422).json({
             error: "Please fill the field properly"
         })
+    } else if (password !== cpassword) {
+        return res.status(422).json({
+            error: "Password and confirm password are not matching"
+        })
+    } else if (typeof password !== "string") {
+        return res.status(422).json({
+            error: "type of password should be string"
+        })
+    } else {
+        try {
+            const userExist = await User.findOne({
+                email: email
+            })
+
+            if (userExist) {
+                return res.status(422).json({
+                    error: "Email already exist"
+                })
+            }
+
+            const user = new User({
+                name, email, phone, work, password, cpassword
+            })
+
+            const userRegister = await user.save()
+
+            if (userRegister) {
+                res.status(201).json({
+                    message: "User saved"
+                })
+            } else {
+                res.status(500).json({
+                    error: "Failed to register"
+                })
+            }
+        } catch (err) {
+            console.log(err)
+        }
     }
 
-    try {
-        const userExist = await User.findOne({
-            email: email
-        })
-
-        if (userExist) {
-            return res.status(422).json({
-                error: "Email already exist"
-            })
-        }
-
-        const user = new User({
-            name, email, phone, work, password, cpassword
-        })
-
-        const userRegister = await user.save()
-
-        if (userRegister) {
-            res.status(201).json({
-                message: "User saved"
-            })
-        } else {
-            res.status(500).json({
-                error: "Failed to register"
-            })
-        }
-    } catch (err) {
-        console.log(err)
-    }
 })
 
 
@@ -66,19 +76,28 @@ router.post("/login", async (req, res) => {
 
     try {
         const userExist = await User.findOne({
-            email: email,
-            password: password
-
+            email: email
         })
+        console.log(userExist?.password)
+
+
+
 
         if (!userExist) {
             return res.status(422).json({
                 error: "Invalid credentials"
             })
         } else {
-            return res.status(201).json({
-                message: "User logged In"
-            })
+            const isMatched = await bcrypt.compare(password, userExist.password)
+            if (isMatched) {
+                return res.status(201).json({
+                    message: "User logged In"
+                })
+            } else {
+                return res.status(422).json({
+                    error: "Invalid credentials"
+                })
+            }
         }
     } catch (err) {
         console.log(err)
