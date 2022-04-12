@@ -20,9 +20,13 @@ router.post('/register', async (req, res) => {
         return res.status(422).json({
             error: "Please fill the field properly"
         })
-    } else if (password != cpassword) {
+    } else if (password !== cpassword) {
         return res.status(422).json({
             error: "Password and confirm password are not matching"
+        })
+    } else if (typeof password !== "string") {
+        return res.status(422).json({
+            error: "type of password should be string"
         })
     } else {
         try {
@@ -74,7 +78,7 @@ router.post("/login", async (req, res) => {
         const userExist = await User.findOne({
             email: email
         })
-        console.log(userExist.password)
+        console.log(userExist?.password)
 
 
 
@@ -94,7 +98,6 @@ router.post("/login", async (req, res) => {
                     error: "Invalid credentials"
                 })
             }
-
         }
     } catch (err) {
         console.log(err)
