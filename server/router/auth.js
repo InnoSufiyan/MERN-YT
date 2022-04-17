@@ -1,5 +1,6 @@
 const express = require('express')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 const router = express.Router()
 
@@ -91,6 +92,10 @@ router.post("/login", async (req, res) => {
             })
         } else {
             const isMatched = await bcrypt.compare(password, userExist.password)
+
+            const token = await userExist.generateAuthToken()
+
+
             if (isMatched) {
                 return res.status(201).json({
                     message: "User logged In"
