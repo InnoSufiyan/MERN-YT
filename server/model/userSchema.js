@@ -37,6 +37,20 @@ userSchema.pre('save', async function(next) {
     next();
 })
 
+
+//we are generating token
+
+userSchema.method.generateAuthToken = async function () {
+    try {
+        let token = jwt.sign({
+            _id: this._id
+        })
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+
 const User = mongoose.model("USER", userSchema)
 
 module.exports = User
