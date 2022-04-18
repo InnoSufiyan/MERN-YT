@@ -95,6 +95,11 @@ router.post("/login", async (req, res) => {
 
             const token = await userExist.generateAuthToken()
 
+            res.cookie("jwtoken", token, {
+                expires: new Date(Date.now() + 25892000000),
+                httpOnly: true
+            })
+
 
             if (isMatched) {
                 return res.status(201).json({
